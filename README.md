@@ -12,6 +12,12 @@ This lab demonstrates:
 
 # Prerequisites
 
+Virtual env:
+
+python -m venv .env
+
+source .env/bin/activate
+
 Install dependency:
 
 pip install pika
@@ -88,7 +94,9 @@ python drain_queue.py
 # Explanation
 
 Shared channel across threads -> unsafe.
+
 Lock ensures one thread publishes at a time.
+
 Lock fixes race condition but reduces concurrency advantage.
 
 ---
@@ -96,9 +104,15 @@ Lock fixes race condition but reduces concurrency advantage.
 # Files
 
 common.py
+
 setup_queue.py
+
 sync_producer.py
+
 thread_bad_shared.py
+
 thread_lock_fixed.py
+
 drain_queue.py
+
 README.md
