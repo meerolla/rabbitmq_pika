@@ -1,118 +1,241 @@
 
-# RabbitMQ + Pika Thread Safety Benchmark Demo
+# RabbitMQ Producer Benchmark Lab 🚀
 
-This lab demonstrates:
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.x-orange)
+![Docker](https://img.shields.io/badge/Docker-required-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-1. Sync producer with Pika
-2. Multithreading using a shared channel (unsafe)
-3. Fix using threading.Lock()
-4. Benchmark results comparison
+A hands‑on lab to explore **RabbitMQ producer performance and Pika thread‑safety** using Python.
+
+This project compares different publishing models:
+
+- **Sync Producer** – baseline RabbitMQ publishing
+- **Threaded Producer (unsafe)** – demonstrates Pika thread‑safety issues
+- **Thread‑safe Producer** – fix using `threading.Lock`
+- **Async Producer** – asynchronous publishing using `aio-pika`
+- **Benchmark Runner** – automated performance comparison
+- **Visualization** – throughput graph generation
+
+---
+
+# Architecture
+
+```
+Producer Models
+     │
+     ▼
+ RabbitMQ Queue
+     │
+     ▼
+Benchmark Runner
+     │
+     ▼
+CSV Results
+     │
+     ▼
+Graph Visualization
+```
+
+---
+
+# Project Structure
+
+```
+rabbitmq_pika_thread_demo
+│
+├── setup_queue.py
+├── sync_producer.py
+├── thread_bad_shared.py
+├── thread_lock_fixed.py
+├── async_producer.py
+├── drain_queue.py
+│
+├── benchmark_runner.py
+├── plot_results.py
+│
+└── README.md
+```
 
 ---
 
 # Prerequisites
 
-Virtual env:
+Create virtual environment
 
+```bash
 python -m venv .env
-
 source .env/bin/activate
+```
 
-Install dependency:
+Install dependencies
 
-pip install pika
+```bash
+pip install pika aio-pika matplotlib
+```
 
-Run RabbitMQ:
+---
 
-docker run -d --name rabbit  -p 5672:5672  -p 15672:15672  rabbitmq:3-management
+# Start RabbitMQ
 
-Management UI:
+```bash
+docker run -d   --name rabbit   -p 5672:5672   -p 15672:15672   rabbitmq:3-management
+```
+
+RabbitMQ Management UI:
+
+```
 http://localhost:15672
-guest / guest
+username: guest
+password: guest
+```
 
 ---
 
-# Step 1: Create queue
+# Step 1 — Create Queue
 
+```bash
 python setup_queue.py
-
-Expected output:
-Queue created successfully
+```
 
 ---
 
-# Step 2: Run Sync Benchmark
+# Step 2 — Run Sync Producer
 
+```bash
 python sync_producer.py
+```
 
-Example output:
+Example result
 
+```
 SYNC RESULT
 Messages: 20000
-Time: 3.2s
-Throughput: ~6000 msg/s
+Time: 1.33s
+Throughput: ~15000 msg/sec
+```
 
 ---
 
-# Step 3: Run Bad Threaded Version
+# Step 3 — Demonstrate Thread Safety Issue
 
+```bash
 python thread_bad_shared.py
+```
 
-Expected:
-Sometimes errors such as:
+Expected behavior:
+
+Possible errors such as:
+
+```
 StreamLostError
 FrameUnderflow
-connection closed unexpectedly
+ConnectionClosed
+```
 
-Or unstable throughput.
+This demonstrates:
 
-This demonstrates Pika channel is NOT thread safe.
+> **Pika channels are NOT thread‑safe**.
 
 ---
 
-# Step 4: Run Fixed Version
+# Step 4 — Thread‑Safe Version
 
+```bash
 python thread_lock_fixed.py
+```
 
-Example output:
+Uses
 
-THREAD LOCK FIX RESULT
-Messages: 25000
-Time: 5.1s
-Throughput: ~4800 msg/s
+```
+threading.Lock()
+```
 
-Stable execution.
+to serialize access to the channel.
 
 ---
 
-# Step 5: Drain Queue Between Runs
+# Step 5 — Drain Queue
 
+```bash
 python drain_queue.py
+```
+
+Removes messages between runs to keep benchmarks consistent.
 
 ---
 
-# Explanation
+# Step 6 — Async Producer
 
-Shared channel across threads -> unsafe.
+```bash
+python async_producer.py
+```
 
-Lock ensures one thread publishes at a time.
-
-Lock fixes race condition but reduces concurrency advantage.
+Uses **aio‑pika** for asynchronous RabbitMQ publishing.
 
 ---
 
-# Files
+# Run Full Benchmark
 
-common.py
+```bash
+python benchmark_runner.py
+```
 
-setup_queue.py
+Output file
 
-sync_producer.py
+```
+benchmark_results.csv
+```
 
-thread_bad_shared.py
+Example:
 
-thread_lock_fixed.py
+```
+test,messages,duration_sec,throughput_msg_sec
+sync,20000,1.33,15064.87
+thread_lock,25000,2.41,10392.78
+async,20000,8.80,2273.16
+```
 
-drain_queue.py
+---
 
-README.md
+# Generate Throughput Graph
+
+```bash
+python plot_results.py
+```
+
+Creates:
+
+```
+benchmark_graph.png
+```
+
+Example comparison
+
+| Producer | Throughput |
+|--------|-------------|
+| Sync | ~15000 msg/s |
+| Thread + Lock | ~10300 msg/s |
+| Async | ~2200 msg/s |
+
+---
+
+# Key Takeaways
+
+- **Pika channels are not thread‑safe**
+- Shared channel across threads can corrupt connections
+- Lock fixes race conditions but reduces concurrency
+- Async helps when many operations run concurrently
+
+---
+
+# Learning Goals
+
+This lab demonstrates:
+
+- RabbitMQ producer performance patterns
+- Pika thread‑safety limitations
+- Sync vs Thread vs Async publishing
+- Simple benchmarking methodology
+
+---
