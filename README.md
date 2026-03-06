@@ -24,7 +24,7 @@ pip install pika
 
 Run RabbitMQ:
 
-docker run -d --name rabbit  -p 5672:5672  -p 15672:15672  rabbitmq:3-management
+docker run -d --name rabbit  -p 5672:5672  -p 15672:1..5672  rabbitmq:3-management
 
 Management UI:
 http://localhost:15672
@@ -101,18 +101,20 @@ Lock fixes race condition but reduces concurrency advantage.
 
 ---
 
-# Files
+Run async producer alone:
 
-common.py
+python async_producer.py
 
-setup_queue.py
+Run all benchmarks:
 
-sync_producer.py
+python benchmark_runner.py
 
-thread_bad_shared.py
+Output:
+benchmark_results.csv
 
-thread_lock_fixed.py
+Generate graph:
 
-drain_queue.py
+python plot_results.py
 
-README.md
+Output:
+benchmark_graph.png
