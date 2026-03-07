@@ -216,7 +216,7 @@ Example comparison
 |--------|-------------|
 | Sync | ~15000 msg/s |
 | Thread + Lock | ~10300 msg/s |
-| Async | ~2200 msg/s |
+| Async | ~6000 msg/s |
 
 ---
 
