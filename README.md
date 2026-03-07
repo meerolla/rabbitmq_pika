@@ -193,7 +193,7 @@ Example:
 test,messages,duration_sec,throughput_msg_sec
 sync,20000,1.33,15064.87
 thread_lock,25000,2.41,10392.78
-async,20000,8.80,2273.16
+async,20000,3.41,5866.49
 ```
 
 ---
