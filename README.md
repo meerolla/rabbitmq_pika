@@ -155,6 +155,15 @@ to serialize access to the channel.
 
 ---
 
+# Thread race condition example
+
+Run
+
+- thread_race_demo.py
+- thread_race_fixed.py
+
+---
+
 # Step 5 — Drain Queue
 
 ```bash
